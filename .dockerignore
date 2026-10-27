@@ -1,0 +1,16 @@
+node_modules
+.next
+coverage
+out
+build
+.git
+.github
+.vercel
+.vscode
+.swc
+*.log
+
+# Variáveis locais nunca entram na imagem; o compose passa BASE_API_URL.
+.env
+.env.*
+!.env.example
