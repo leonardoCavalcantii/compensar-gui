@@ -7,6 +7,7 @@ interface CompetencesProps {
 }
 
 const Competences: FC<CompetencesProps>  = ({ competences }) => {
+  const list = Array.isArray(competences) ? competences : [];
   return (
     <Grid
       container
@@ -19,7 +20,7 @@ const Competences: FC<CompetencesProps>  = ({ competences }) => {
         marginTop: 0
       }}
     >
-      {competences.map((competence, index) => (
+      {list.map((competence, index) => (
         <Competence key={index} competence={competence}/>
       ))}
     </Grid>
