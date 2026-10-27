@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# compensar-gui
 
-## Getting Started
+Frontend do ComPensar: Next.js 14, Material UI, React Query, react-hook-form e yup.
+O backend fica em outro repositório, o [compensar-core](https://github.com/ufcg-lsd/compensar-core).
 
-First, run the development server:
+As rotas de `src/pages/api` repassam as chamadas do navegador ao backend, do lado do servidor,
+usando a variável `BASE_API_URL`.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Requisitos
+
+- [Git](https://git-scm.com/).
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (no Windows, com WSL 2), para subir tudo com Docker.
+- Para rodar sem Docker: [Node.js 24 (LTS)](https://nodejs.org/) com npm e o backend rodando.
+
+## Subir o sistema completo com Docker
+
+O `docker-compose.yml` fica no repositório do backend e sobe MongoDB, carga inicial, backend e
+este frontend. Clone os dois repositórios lado a lado:
+
+```text
+qualquer-pasta/
+├── compensar-core/   (backend, com o docker-compose.yml)
+└── compensar-gui/    (este repositório)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+```bash
+cd compensar-core
+cp .env.example .env   # preencha PRIVATE_KEY (veja o README do backend)
+docker compose up
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Acesse <http://localhost:3000>. O passo a passo completo, o primeiro acesso e os problemas comuns
+no Windows estão no [README do compensar-core](https://github.com/ufcg-lsd/compensar-core#readme).
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+No compose, este repositório é montado no container: as mudanças em `src/` aparecem sem reiniciar.
 
-## Learn More
+Por causa dessa montagem, o `.env` e o `.env.local` desta pasta, se existirem, também aparecem
+dentro do container (o `.dockerignore` só os tira da imagem). Isso não muda o endereço do backend:
+o compose define `BASE_API_URL=http://backend:8080` no ambiente do container, e o Next não
+substitui uma variável que já está no ambiente pelo valor dos arquivos `.env`.
 
-To learn more about Next.js, take a look at the following resources:
+## Rodar sem Docker
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Com o backend rodando (com ou sem Docker) em <http://localhost:8080>:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+```bash
+npm ci
+cp .env.example .env.local   # ajuste BASE_API_URL se o backend estiver em outro endereço
+npm run dev                  # http://localhost:3000
+```
 
-## Deploy on Vercel
+Para criar o primeiro usuário, use a tela **Criar conta** (<http://localhost:3000/create-account>).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Variáveis de ambiente
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Estão no [.env.example](.env.example). Nenhum endereço fica fixo no código.
+
+| Variável       | Obrigatória | Descrição |
+|----------------|-------------|-----------|
+| `BASE_API_URL` | sim         | Endereço do backend, sem barra no final. Sem Docker: `http://localhost:8080`. No compose: `http://backend:8080` (definido no próprio `docker-compose.yml`). |
